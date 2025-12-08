@@ -21,7 +21,7 @@ A privacy-focused, local-only tool designed to analyze password strength, detect
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/yourusername/password-health-analyzer.git
+    git clone https://github.com/BenkacemIbrahim/password-health-analyzer.git
     cd password-health-analyzer
     ```
 
