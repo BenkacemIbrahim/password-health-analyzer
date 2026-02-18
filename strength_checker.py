@@ -1,7 +1,11 @@
-import re
-import math
+"""Password strength analysis and scoring."""
+
+from __future__ import annotations
+
 import logging
-from typing import Iterable, Dict, Any
+import math
+import re
+from typing import Any
 
 log = logging.getLogger(__name__)
 
@@ -18,17 +22,12 @@ _COMMON_PASSWORDS = {
     "soccer","starwars","jennifer","love","orange","computer","michelle","123abc","1q2w3e","q1w2e3",
 }
 
-_KEYBOARD_ROWS = [
+_KEYBOARD_ROWS = (
     "qwertyuiop",
     "asdfghjkl",
     "zxcvbnm",
     "1234567890",
-]
-
-
-def _contains_any(s: str, patterns: Iterable[str]) -> bool:
-    low = s.lower()
-    return any(p in low for p in patterns)
+)
 
 
 def _has_keyboard_sequence(s: str) -> bool:
@@ -59,9 +58,22 @@ def _has_monotonic_sequence(s: str, k: int = 4) -> bool:
     return False
 
 
-def analyze_password(pwd: str) -> Dict[str, Any]:
+def analyze_password(pwd: str) -> dict[str, Any]:
+    """Analyze password characteristics and return scoring details."""
     if not pwd:
-        return {"score": 0, "entropy_bits": 0.0, "length": 0, "lower": False, "upper": False, "digit": False, "symbol": False, "common": False, "sequence": False, "keyboard": False, "repeats": False}
+        return {
+            "score": 0,
+            "entropy_bits": 0.0,
+            "length": 0,
+            "lower": False,
+            "upper": False,
+            "digit": False,
+            "symbol": False,
+            "common": False,
+            "sequence": False,
+            "keyboard": False,
+            "repeats": False,
+        }
 
     length = len(pwd)
     lower = any(c.islower() for c in pwd)
@@ -137,4 +149,5 @@ def analyze_password(pwd: str) -> Dict[str, Any]:
 
 
 def score_password(pwd: str) -> int:
+    """Return only the normalized 0-10 score for a password."""
     return analyze_password(pwd)["score"]

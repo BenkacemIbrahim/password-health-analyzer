@@ -1,23 +1,42 @@
-from typing import List, Dict, Tuple
-from difflib import SequenceMatcher
+"""Password reuse detection helpers."""
+
+from __future__ import annotations
+
 import logging
+from collections import Counter
+from difflib import SequenceMatcher
+from typing import TypedDict
 
 log = logging.getLogger(__name__)
 
 
-def detect_reuse(passwords: List[str], similarity_threshold: float = 0.85, max_similarity_pairs: int = 5000) -> Dict[str, object]:
-    counts: Dict[str, int] = {}
-    for p in passwords:
-        if p:
-            counts[p] = counts.get(p, 0) + 1
-    exact = {p: c for p, c in counts.items() if c > 1}
+class ReuseResult(TypedDict):
+    """Structured result for reuse detection."""
+
+    exact: dict[str, int]
+    similar: list[tuple[str, str, float]]
+
+
+def detect_reuse(
+    passwords: list[str],
+    similarity_threshold: float = 0.85,
+    max_similarity_pairs: int = 5000,
+) -> ReuseResult:
+    """Find exact and near-duplicate passwords in a list."""
+    if not 0.0 <= similarity_threshold <= 1.0:
+        raise ValueError("similarity_threshold must be between 0.0 and 1.0")
+    if max_similarity_pairs < 0:
+        raise ValueError("max_similarity_pairs must be non-negative")
+
+    counts = Counter(p for p in passwords if p)
+    exact = {password: count for password, count in counts.items() if count > 1}
     uniq = list(counts.keys())
     n = len(uniq)
 
-    similar: List[Tuple[str, str, float]] = []
+    similar: list[tuple[str, str, float]] = []
     pair_budget = max_similarity_pairs
     if n > 1 and pair_budget > 0:
-        # Limit O(n^2) similarity checks using a simple budget; exact duplicates already O(n)
+        # Limit O(n^2) similarity checks; exact duplicate counting is already O(n).
         for i in range(n):
             if pair_budget <= 0:
                 break

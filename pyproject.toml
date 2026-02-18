@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "credential-hygiene-analyzer"
+version = "0.1.0"
+description = "Local-first password strength, reuse, generation, and encrypted storage toolkit."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Credential Hygiene Analyzer Contributors" }
+]
+dependencies = [
+  "cryptography>=41.0.0"
+]
+keywords = ["password", "security", "tkinter", "cli", "encryption"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Security",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.6.8"
+]
+
+[tool.setuptools]
+py-modules = [
+  "main",
+  "gui",
+  "strength_checker",
+  "reuse_detector",
+  "generator",
+  "storage",
+  "tests",
+]
+
+[tool.ruff]
+line-length = 140
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]

@@ -1,18 +1,44 @@
-"""Tkinter GUI for the Password Health Analyzer."""
+﻿"""Tkinter GUI for the Password Health Analyzer."""
 
-import tkinter as tk
-from tkinter import ttk, messagebox, filedialog, simpledialog
-import tkinter.font as tkfont
-from typing import List
+from __future__ import annotations
+
 import logging
+import tkinter as tk
+import tkinter.font as tkfont
+from tkinter import filedialog, messagebox, simpledialog, ttk
 
-from strength_checker import analyze_password, score_password
-from reuse_detector import detect_reuse
 from generator import generate_password
-from storage import save_passwords, load_passwords
-
+from reuse_detector import detect_reuse
+from storage import load_passwords, save_passwords
+from strength_checker import analyze_password, score_password
 
 log = logging.getLogger(__name__)
+
+_LIGHT_COLORS = {
+    "bg": "#f5f6f8",
+    "fg": "#1f2937",
+    "muted": "#6b7280",
+    "primary": "#4f46e5",
+    "primary_hover": "#4338ca",
+    "secondary": "#0ea5e9",
+    "secondary_hover": "#0284c7",
+    "success": "#22c55e",
+    "danger": "#ef4444",
+    "surface": "#ffffff",
+}
+
+_DARK_COLORS = {
+    "bg": "#121212",
+    "fg": "#f3f4f6",
+    "muted": "#9ca3af",
+    "primary": "#6366f1",
+    "primary_hover": "#4f46e5",
+    "secondary": "#38bdf8",
+    "secondary_hover": "#0ea5e9",
+    "success": "#22c55e",
+    "danger": "#f87171",
+    "surface": "#1f2937",
+}
 
 
 class PasswordHealthAnalyzerApp(tk.Tk):
@@ -23,43 +49,47 @@ class PasswordHealthAnalyzerApp(tk.Tk):
         self.title("Password Health Analyzer")
         self.geometry("800x600")
         self.minsize(700, 500)
-        self.passwords: List[str] = []
+        self.passwords: list[str] = []
         self.dark_mode_var = tk.BooleanVar(value=False)
-        self.default_font = tkfont.Font(family="Arial", size=11)
+        self.default_font = tkfont.Font(family="Segoe UI", size=11)
         self._apply_modern_theme()
         self._build_ui()
         self._bind_shortcuts()
 
     def _apply_modern_theme(self) -> None:
         self.style = ttk.Style(self)
-        self.style.theme_use('clam')
-        self.colors = {
-            "bg": "#f5f6f8",
-            "fg": "#1f2937",
-            "muted": "#6b7280",
-            "primary": "#4f46e5",
-            "primary_hover": "#4338ca",
-            "secondary": "#0ea5e9",
-            "secondary_hover": "#0284c7",
-            "success": "#22c55e",
-            "danger": "#ef4444",
-            "surface": "#ffffff",
-        }
-        self.configure(bg=self.colors["bg"]) 
-        self.style.configure("TFrame", background=self.colors["bg"]) 
+        self.style.theme_use("clam")
+        self.colors = dict(_LIGHT_COLORS)
+        self._apply_current_palette()
+
+    def _apply_current_palette(self) -> None:
+        self.configure(bg=self.colors["bg"])
+        self.style.configure("TFrame", background=self.colors["bg"])
         self.style.configure("TLabelframe", background=self.colors["bg"], borderwidth=1, relief="solid")
-        self.style.configure("TLabelframe.Label", background=self.colors["bg"], foreground=self.colors["fg"], font=("Segoe UI", 11, "bold"))
-        self.style.configure("TLabel", background=self.colors["bg"], foreground=self.colors["fg"]) 
-        self.style.configure("TCheckbutton", background=self.colors["bg"], foreground=self.colors["fg"]) 
-        self.style.configure("TEntry", fieldbackground=self.colors["surface"]) 
-        self.style.configure("Primary.TButton", background=self.colors["primary"], foreground="#ffffff", padding=8) 
+        self.style.configure(
+            "TLabelframe.Label",
+            background=self.colors["bg"],
+            foreground=self.colors["fg"],
+            font=("Segoe UI", 11, "bold"),
+        )
+        self.style.configure("TLabel", background=self.colors["bg"], foreground=self.colors["fg"])
+        self.style.configure("TCheckbutton", background=self.colors["bg"], foreground=self.colors["fg"])
+        self.style.configure("TEntry", fieldbackground=self.colors["surface"])
+        self.style.configure("Primary.TButton", background=self.colors["primary"], foreground="#ffffff", padding=8)
         self.style.map("Primary.TButton", background=[("active", self.colors["primary_hover"])])
         self.style.configure("Secondary.TButton", background=self.colors["secondary"], foreground="#ffffff", padding=8)
         self.style.map("Secondary.TButton", background=[("active", self.colors["secondary_hover"])])
         self.style.configure("Danger.TButton", background=self.colors["danger"], foreground="#ffffff", padding=8)
         self.style.map("Danger.TButton", background=[("active", "#dc2626")])
-        self.style.configure("Horizontal.TProgressbar", background=self.colors["success"]) 
-        self.style.configure("ToolTip.TLabel", background=self.colors["surface"], foreground=self.colors["fg"], borderwidth=1, relief="solid", padding=6)
+        self.style.configure("Horizontal.TProgressbar", background=self.colors["success"])
+        self.style.configure(
+            "ToolTip.TLabel",
+            background=self.colors["surface"],
+            foreground=self.colors["fg"],
+            borderwidth=1,
+            relief="solid",
+            padding=6,
+        )
 
     def _build_ui(self) -> None:
         hud = ttk.Frame(self)
@@ -246,52 +276,12 @@ class PasswordHealthAnalyzerApp(tk.Tk):
         self.listbox.config(font=self.default_font, bg=self.colors["surface"], fg=self.colors["fg"], relief="solid", bd=1)
 
     def _toggle_dark_mode(self) -> None:
-        val = self.dark_mode_var.get()
-        if val:
-            self.colors.update({
-                "bg": "#121212",
-                "fg": "#f3f4f6",
-                "muted": "#9ca3af",
-                "primary": "#6366f1",
-                "primary_hover": "#4f46e5",
-                "secondary": "#38bdf8",
-                "secondary_hover": "#0ea5e9",
-                "success": "#22c55e",
-                "danger": "#f87171",
-                "surface": "#1f2937",
-            })
-        else:
-            self.colors.update({
-                "bg": "#f5f6f8",
-                "fg": "#1f2937",
-                "muted": "#6b7280",
-                "primary": "#4f46e5",
-                "primary_hover": "#4338ca",
-                "secondary": "#0ea5e9",
-                "secondary_hover": "#0284c7",
-                "success": "#22c55e",
-                "danger": "#ef4444",
-                "surface": "#ffffff",
-            })
-        self.configure(bg=self.colors["bg"]) 
-        self.style.configure("TFrame", background=self.colors["bg"]) 
-        self.style.configure("TLabelframe", background=self.colors["bg"], borderwidth=1, relief="solid")
-        self.style.configure("TLabelframe.Label", background=self.colors["bg"], foreground=self.colors["fg"], font=("Segoe UI", 11, "bold"))
-        self.style.configure("TLabel", background=self.colors["bg"], foreground=self.colors["fg"]) 
-        self.style.configure("TCheckbutton", background=self.colors["bg"], foreground=self.colors["fg"]) 
-        self.style.configure("TEntry", fieldbackground=self.colors["surface"]) 
-        self.style.configure("Primary.TButton", background=self.colors["primary"], foreground="#ffffff", padding=8) 
-        self.style.map("Primary.TButton", background=[("active", self.colors["primary_hover"])])
-        self.style.configure("Secondary.TButton", background=self.colors["secondary"], foreground="#ffffff", padding=8)
-        self.style.map("Secondary.TButton", background=[("active", self.colors["secondary_hover"])])
-        self.style.configure("Danger.TButton", background=self.colors["danger"], foreground="#ffffff", padding=8)
-        self.style.map("Danger.TButton", background=[("active", "#dc2626")])
-        self.style.configure("Horizontal.TProgressbar", background=self.colors["success"]) 
-        self.style.configure("ToolTip.TLabel", background=self.colors["surface"], foreground=self.colors["fg"]) 
-        self.results_text.config(bg=self.colors["surface"], fg=self.colors["fg"]) 
-        self.listbox.config(bg=self.colors["surface"], fg=self.colors["fg"]) 
-        self.strength_label.config(bg=self.colors["bg"], fg=self.colors["fg"]) 
-        self.title_label.config(foreground=self.colors["fg"]) 
+        self.colors = dict(_DARK_COLORS if self.dark_mode_var.get() else _LIGHT_COLORS)
+        self._apply_current_palette()
+        self.results_text.config(bg=self.colors["surface"], fg=self.colors["fg"])
+        self.listbox.config(bg=self.colors["surface"], fg=self.colors["fg"])
+        self.strength_label.config(bg=self.colors["bg"], fg=self.colors["fg"])
+        self.title_label.config(foreground=self.colors["fg"])
 
     def save_list(self) -> None:
         if not self.passwords:
@@ -357,7 +347,7 @@ class PasswordHealthAnalyzerApp(tk.Tk):
         self.refresh_listbox()
 
     def _mask(self, s: str) -> str:
-        return "•" * len(s)
+        return "*" * len(s)
 
     def _bind_shortcuts(self) -> None:
         self.bind("<Control-a>", lambda e: self.add_password())
@@ -370,7 +360,7 @@ class PasswordHealthAnalyzerApp(tk.Tk):
         self.bind("<Control-c>", lambda e: self.copy_generated_to_clipboard())
         self.bind("<F2>", lambda e: self._toggle_dark_mode())
 
-    def _add_tooltips(self, mapping: dict) -> None:
+    def _add_tooltips(self, mapping: dict[tk.Widget, str]) -> None:
         for w, text in mapping.items():
             _Tooltip(w, text, "ToolTip.TLabel")
 
@@ -439,3 +429,4 @@ class _Tooltip:
         if self.tip:
             self.tip.destroy()
             self.tip = None
+

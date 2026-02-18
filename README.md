@@ -1,85 +1,131 @@
-# Password Health Analyzer
+# Credential Hygiene Analyzer
 
-A privacy-focused, local-only tool designed to analyze password strength, detect reuse, and generate secure passwords. This application features a modern Tkinter GUI and a command-line interface for quick assessments.
+A local-first Python application for evaluating password strength, detecting password reuse, generating strong credentials, and securely storing password lists.
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 
-## 🚀 Features
+## Why this project
 
-- **Strength Analysis**:  Evaluates passwords on a 0–10 scale based on entropy, common dictionary words, and sequence patterns.
-- **Reuse Detection**: Identifies exact duplicates and similar passwords (using similarity thresholds) to prevent security risks.
-- **Secure Password Generator**: built-in generator using Python's `secrets` module for cryptographically strong passwords. Customizable constraints (length, uppercase, lowercase, digits, symbols).
-- **Encrypted Storage**: Save and load your analyzed password lists securely. Uses `Fernet` (AES) encryption if `cryptography` is installed, with a secure fallback for standard library users.
-- **Modern GUI**: A user-friendly interface built with Tkinter, featuring:
-    - Dark Mode toggle
-    - Tooltips and keyboard shortcuts
-    - Responsive layout
-- **CLI Support**: Quick command-line checks for strength and reuse testing.
+Weak and reused passwords remain one of the most common causes of account compromise. This project gives users a private desktop tool to:
 
-## 🛠️ Installation
+- score password strength on a clear 0-10 scale,
+- identify exact and near-duplicate passwords,
+- generate strong passwords with custom policy constraints,
+- save and load encrypted password sets locally.
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/BenkacemIbrahim/password-health-analyzer.git
-    cd password-health-analyzer
-    ```
+No cloud sync is used and no telemetry is collected.
 
-2.  **Install dependencies:**
-    The application runs with standard Python libraries. For enhanced security (Fernet encryption), install the optional `cryptography` package:
-    ```bash
-    pip install -r requirements.txt
-    ```
+## Core features
 
-## 💻 Usage
+- Strength analysis (`strength_checker.py`)
+- Reuse and similarity detection (`reuse_detector.py`)
+- Secure password generation using `secrets` (`generator.py`)
+- Encrypted local storage with Fernet when available (`storage.py`)
+- Desktop GUI built with Tkinter (`gui.py`)
+- CLI entrypoint for quick checks (`main.py`)
 
-### Graphical User Interface (GUI)
-Run the main script to launch the application:
+## Quick start
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/<your-account>/password-health-analyzer.git
+cd password-health-analyzer
+```
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run the app
+
+GUI mode:
+
 ```bash
 python main.py
 ```
-- **Add Password**: specificy passwords to analyze.
-- **Analyze Strength**: Select a password to see detailed metrics.
-- **Check Reuses**: Scan the list for duplicate or similar passwords.
-- **Generate**: Create new, strong passwords.
-- **Save/Load**: Encrypt and save your session to a `.pha` file.
 
-### Command Line Interface (CLI)
+CLI strength check:
 
-Check a single password's strength:
 ```bash
-python main.py --password "YourP@ssw0rd"
+python main.py --password "MyS3cure!Passphrase"
 ```
 
-Run a sample reuse detection test:
+CLI reuse demo:
+
 ```bash
-python main.py --test-reuse
+python main.py --test-reuse --threshold 0.85
 ```
 
-## ⌨️ Shortcuts
+## Keyboard shortcuts (GUI)
 
 | Shortcut | Action |
-|----------|--------|
-| `Ctrl+A` | Add Password |
-| `Ctrl+E` | Analyze Last Password |
-| `Ctrl+R` | Check Reuses |
-| `Ctrl+G` | Generate Password |
-| `Ctrl+C` | Copy Generated Password |
-| `Ctrl+S` | Save List |
-| `Ctrl+O` | Load List |
-| `Ctrl+L` | Clear List |
-| `F2`     | Toggle Dark Mode |
+| --- | --- |
+| `Ctrl+A` | Add password |
+| `Ctrl+E` | Analyze last password |
+| `Ctrl+R` | Check reuse |
+| `Ctrl+G` | Generate password |
+| `Ctrl+C` | Copy generated password |
+| `Ctrl+S` | Save encrypted list |
+| `Ctrl+O` | Load encrypted list |
+| `Ctrl+L` | Clear list |
+| `F2` | Toggle dark mode |
 
-## 🔒 Security Note
+## Security model
 
-- **Local Only**: No data is ever sent to the cloud. All analysis happens locally on your machine.
-- **No Logging**: Passwords are not logged.
-- **Encryption**: If saving lists, they are encrypted with a user-provided master password.
+- Analysis runs locally on your machine.
+- Passwords are never sent to remote services.
+- Saved lists are encrypted.
+- Preferred storage mode uses `cryptography.fernet`.
+- A compatibility fallback exists when `cryptography` is unavailable. For best protection, keep `cryptography` installed.
 
-## 🤝 Contributing
+See `SECURITY.md` for reporting guidance and detailed notes.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## Testing
 
-## 📄 License
+Run all tests:
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```bash
+python -m unittest -v
+```
+
+Developer tooling:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+## Project structure
+
+```text
+main.py               # CLI + GUI launcher
+gui.py                # Tkinter application
+strength_checker.py   # Password scoring logic
+reuse_detector.py     # Duplicate/similarity checks
+generator.py          # Secure password generation
+storage.py            # Encrypted local persistence
+tests.py              # Unit test suite
+docs/ARCHITECTURE.md  # Design overview
+```
+
+## Documentation
+
+- `docs/ARCHITECTURE.md`
+- `docs/ROADMAP.md`
+- `CONTRIBUTING.md`
+- `SECURITY.md`
+- `CODE_OF_CONDUCT.md`
+- `CHANGELOG.md`
+
+## Roadmap
+
+- Add import/export support for CSV and JSON (encrypted at rest).
+- Add per-password recommendation explanations in the GUI.
+- Add packaged desktop release artifacts.
+
+## License
+
+MIT License. See `LICENSE`.

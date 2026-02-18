@@ -1,6 +1,9 @@
+"""Secure password generation utilities."""
+
+from __future__ import annotations
+
 import secrets
 import string
-import random
 
 
 def generate_password(
@@ -10,6 +13,13 @@ def generate_password(
     use_digits: bool = True,
     use_symbols: bool = True,
 ) -> str:
+    """Generate a cryptographically secure password.
+
+    Ensures every enabled character category appears at least once.
+    """
+    if length <= 0:
+        raise ValueError("Length must be greater than zero")
+
     categories = []
     if use_upper:
         categories.append(string.ascii_uppercase)
@@ -29,6 +39,6 @@ def generate_password(
     remaining = length - len(password_chars)
     for _ in range(remaining):
         password_chars.append(secrets.choice(pool))
-    random.SystemRandom().shuffle(password_chars)
+    secrets.SystemRandom().shuffle(password_chars)
     return "".join(password_chars)
 
