@@ -16,6 +16,23 @@ Weak and reused passwords remain one of the most common causes of account compro
 
 No cloud sync is used and no telemetry is collected.
 
+## Screenshots
+
+### Desktop GUI - Light Mode & Strength Analysis
+![Light Mode GUI](screenshots/gui_light_mode.png)
+
+### Password Reuse Detection
+![Reuse Detection GUI](screenshots/gui_reuse_check.png)
+
+### Desktop GUI - Dark Mode
+![Dark Mode GUI](screenshots/gui_dark_mode.png)
+
+### Secure Password Generation
+![Password Generator Focus](screenshots/gui_generator_focus.png)
+
+### Command Line Interface (CLI)
+![CLI Interface](screenshots/cli_demonstration.png)
+
 ## Core features
 
 - Strength analysis (`strength_checker.py`)
